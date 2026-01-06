@@ -1,0 +1,22 @@
+{
+  "name": "@pet360/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for Pet360",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist node_modules"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "pet360",
+  "version": "1.0.0",
+  "description": "Sistema completo para gestao de negocios pet - clinicas veterinarias, pet shops, hoteis, creches e ONGs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "dev:api": "pnpm --filter @pet360/api run dev",
+    "dev:web": "pnpm --filter @pet360/web run dev",
+    "build": "pnpm -r run build",
+    "build:api": "pnpm --filter @pet360/api run build",
+    "build:web": "pnpm --filter @pet360/web run build",
+    "start": "pnpm -r --parallel run start",
+    "start:api": "pnpm --filter @pet360/api run start",
+    "start:web": "pnpm --filter @pet360/web run start",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test",
+    "db:generate": "pnpm --filter @pet360/api run db:generate",
+    "db:migrate": "pnpm --filter @pet360/api run db:migrate",
+    "db:push": "pnpm --filter @pet360/api run db:push",
+    "db:seed": "pnpm --filter @pet360/api run db:seed",
+    "db:studio": "pnpm --filter @pet360/api run db:studio",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:prod": "docker-compose -f docker-compose.yml up -d",
+    "docker:prod:down": "docker-compose -f docker-compose.yml down",
+    "clean": "pnpm -r run clean && rm -rf node_modules"
+  },
+  "keywords": [
+    "pet",
+    "veterinary",
+    "pet-shop",
+    "saas",
+    "management"
+  ],
+  "author": "Pet360 Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

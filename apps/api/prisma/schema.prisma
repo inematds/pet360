@@ -1,0 +1,1345 @@
+// ===========================================
+// PET360 - Prisma Schema
+// Sistema completo para gestao de negocios pet
+// ===========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// ENUMS
+// ===========================================
+
+enum Species {
+  DOG
+  CAT
+  BIRD
+  RODENT
+  REPTILE
+  FISH
+  OTHER
+}
+
+enum PetSize {
+  MINI
+  SMALL
+  MEDIUM
+  LARGE
+  GIANT
+}
+
+enum PetGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum AdoptionStatus {
+  AVAILABLE
+  IN_PROCESS
+  ADOPTED
+  RETURNED
+  UNAVAILABLE
+}
+
+enum BoardingStatus {
+  RESERVED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  CONSULTATION
+  VACCINE
+  SURGERY
+  EXAM
+  GROOMING
+  RETURN
+  EMERGENCY
+  TRAINING
+}
+
+enum PaymentMethod {
+  CASH
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  TRANSFER
+  INSTALLMENT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+  REFUNDED
+  CANCELLED
+}
+
+enum VaccineType {
+  V8
+  V10
+  RABIES
+  GIARDIA
+  FLU
+  LEISHMANIASIS
+  FELINE_TRIPLE
+  FELINE_QUADRUPLE
+  FELINE_LEUKEMIA
+  OTHER
+}
+
+enum StockMovementType {
+  PURCHASE
+  SALE
+  SERVICE_USE
+  ADJUSTMENT
+  RETURN
+  LOSS
+  EXPIRED
+}
+
+enum RoomType {
+  INDIVIDUAL
+  SHARED
+  SUITE
+  ICU
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  VET
+  GROOMER
+  ATTENDANT
+  TRAINER
+}
+
+// ===========================================
+// CORE: NEGOCIO
+// ===========================================
+
+model Business {
+  id                  String   @id @default(cuid())
+  name                String
+  slug                String   @unique
+  cnpj                String?  @unique
+  phone               String
+  email               String?
+  businessTypes       String[]
+  address             String?
+  city                String?
+  state               String?
+  zipCode             String?
+  logoUrl             String?
+  whatsappInstanceId  String?
+  whatsappConnected   Boolean  @default(false)
+  settings            Json     @default("{}")
+  openingHours        Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  users           User[]
+  tutors          Tutor[]
+  pets            Pet[]
+  services        Service[]
+  appointments    Appointment[]
+  adoptionAnimals AdoptionAnimal[]
+  boardingRooms   BoardingRoom[]
+  boardings       Boarding[]
+  daycarePackages DaycarePackage[]
+  products        Product[]
+  sales           Sale[]
+  cashRegisters   CashRegister[]
+  vaccines        VaccineRecord[]
+  medicalRecords  MedicalRecord[]
+  campaigns       Campaign[]
+  messageTemplates MessageTemplate[]
+
+  @@map("businesses")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  businessId     String
+  name           String
+  email          String
+  phone          String
+  role           UserRole  @default(ATTENDANT)
+  crmv           String?
+  specialties    String[]
+  color          String?
+  passwordHash   String?
+  otpCode        String?
+  otpExpiresAt   DateTime?
+  isActive       Boolean   @default(true)
+  commissionRate Decimal?  @db.Decimal(5, 2)
+  avatarUrl      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  business        Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  appointments    Appointment[]
+  medicalRecords  MedicalRecord[]
+  vaccineRecords  VaccineRecord[]
+  sales           Sale[]
+  boardingUpdates BoardingUpdate[]
+
+  @@unique([businessId, email])
+  @@map("users")
+}
+
+// ===========================================
+// TUTORES E PETS
+// ===========================================
+
+model Tutor {
+  id               String    @id @default(cuid())
+  businessId       String
+  name             String
+  cpf              String?
+  email            String?
+  phone            String
+  phone2           String?
+  address          String?
+  number           String?
+  complement       String?
+  neighborhood     String?
+  city             String?
+  state            String?
+  zipCode          String?
+  preferredContact String    @default("WHATSAPP")
+  preferredTime    String?
+  totalSpent       Decimal   @default(0) @db.Decimal(10, 2)
+  creditBalance    Decimal   @default(0) @db.Decimal(10, 2)
+  hasDebt          Boolean   @default(false)
+  acceptsMarketing Boolean   @default(true)
+  birthDate        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  lastVisitAt      DateTime?
+
+  business           Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  pets               Pet[]
+  appointments       Appointment[]
+  boardings          Boarding[]
+  daycareEnrollments DaycareEnrollment[]
+  sales              Sale[]
+  adoptions          Adoption[]
+
+  @@unique([businessId, cpf])
+  @@index([businessId, phone])
+  @@map("tutors")
+}
+
+model Pet {
+  id                  String    @id @default(cuid())
+  businessId          String
+  tutorId             String?
+  name                String
+  species             Species
+  breed               String?
+  size                PetSize?
+  gender              PetGender @default(UNKNOWN)
+  color               String?
+  birthDate           DateTime?
+  estimatedAge        String?
+  weight              Decimal?  @db.Decimal(5, 2)
+  microchipNumber     String?
+  isNeutered          Boolean   @default(false)
+  neuteredDate        DateTime?
+  photoUrl            String?
+  photos              String[]
+  allergies           String[]
+  chronicConditions   String[]
+  dietaryRestrictions String?
+  observations        String?
+  temperament         String?
+  socialization       String?
+  isActive            Boolean   @default(true)
+  isDeceased          Boolean   @default(false)
+  deceasedDate        DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  business           Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  tutor              Tutor?              @relation(fields: [tutorId], references: [id], onDelete: SetNull)
+  appointments       Appointment[]
+  vaccineRecords     VaccineRecord[]
+  medicalRecords     MedicalRecord[]
+  boardings          Boarding[]
+  daycareEnrollments DaycareEnrollment[]
+  adoptionProfile    AdoptionAnimal?
+
+  @@index([businessId])
+  @@index([tutorId])
+  @@map("pets")
+}
+
+// ===========================================
+// PRONTUARIO E VACINAS
+// ===========================================
+
+model MedicalRecord {
+  id                    String    @id @default(cuid())
+  businessId            String
+  petId                 String
+  vetId                 String
+  appointmentId         String?
+  recordDate            DateTime  @default(now())
+  recordType            String
+  weight                Decimal?  @db.Decimal(5, 2)
+  temperature           Decimal?  @db.Decimal(4, 1)
+  heartRate             Int?
+  respiratoryRate       Int?
+  hydration             String?
+  bodyCondition         Int?
+  chiefComplaint        String?
+  historyPresent        String?
+  physicalExam          String?
+  diagnosis             String?
+  differentialDiagnosis String[]
+  treatment             String?
+  prescription          Json?
+  examsRequested        String[]
+  procedures            String[]
+  instructions          String?
+  returnDate            DateTime?
+  prognosis             String?
+  attachments           String[]
+  images                String[]
+  isHospitalized        Boolean   @default(false)
+  admissionDate         DateTime?
+  dischargeDate         DateTime?
+  hospitalizationNotes  String?
+  isSurgical            Boolean   @default(false)
+  surgeryType           String?
+  anesthesiaType        String?
+  surgeryNotes          String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  business      Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  pet           Pet            @relation(fields: [petId], references: [id], onDelete: Cascade)
+  vet           User           @relation(fields: [vetId], references: [id])
+  appointment   Appointment?   @relation(fields: [appointmentId], references: [id])
+  prescriptions Prescription[]
+
+  @@index([businessId])
+  @@index([petId])
+  @@index([vetId])
+  @@map("medical_records")
+}
+
+model Prescription {
+  id              String  @id @default(cuid())
+  medicalRecordId String
+  medication      String
+  concentration   String?
+  form            String?
+  dosage          String
+  frequency       String
+  duration        String
+  route           String?
+  instructions    String?
+  isControlled    Boolean @default(false)
+  quantity        Int?
+  refills         Int     @default(0)
+
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+
+  @@map("prescriptions")
+}
+
+model VaccineRecord {
+  id              String       @id @default(cuid())
+  businessId      String
+  petId           String
+  vetId           String
+  appointmentId   String?
+  vaccineType     VaccineType
+  vaccineName     String
+  manufacturer    String?
+  batchNumber     String?
+  applicationDate DateTime
+  expirationDate  DateTime?
+  nextDoseDate    DateTime?
+  nextDoseType    VaccineType?
+  reminderSent30d Boolean      @default(false)
+  reminderSent7d  Boolean      @default(false)
+  reminderSentDay Boolean      @default(false)
+  hadReaction     Boolean      @default(false)
+  reactionNotes   String?
+  certificateUrl  String?
+  createdAt       DateTime     @default(now())
+
+  business    Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  pet         Pet          @relation(fields: [petId], references: [id], onDelete: Cascade)
+  vet         User         @relation(fields: [vetId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@index([businessId])
+  @@index([petId])
+  @@index([nextDoseDate])
+  @@map("vaccine_records")
+}
+
+// ===========================================
+// ADOCAO
+// ===========================================
+
+model AdoptionAnimal {
+  id                String         @id @default(cuid())
+  businessId        String
+  petId             String         @unique
+  rescueDate        DateTime?
+  rescueLocation    String?
+  rescueStory       String?
+  previousOwner     String?
+  status            AdoptionStatus @default(AVAILABLE)
+  availableDate     DateTime       @default(now())
+  adoptedDate       DateTime?
+  isVaccinated      Boolean        @default(false)
+  isNeutered        Boolean        @default(false)
+  isDewormed        Boolean        @default(false)
+  healthNotes       String?
+  goodWithKids      Boolean?
+  goodWithDogs      Boolean?
+  goodWithCats      Boolean?
+  apartmentFriendly Boolean?
+  energyLevel       String?
+  trainingLevel     String?
+  requirements      String?
+  adoptionFee       Decimal?       @db.Decimal(10, 2)
+  videoUrl          String?
+  description       String?
+  isPublished       Boolean        @default(true)
+  publishedOnSite   Boolean        @default(true)
+  featuredUntil     DateTime?
+  viewCount         Int            @default(0)
+  inquiryCount      Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  business  Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  pet       Pet               @relation(fields: [petId], references: [id], onDelete: Cascade)
+  adoptions Adoption[]
+  inquiries AdoptionInquiry[]
+
+  @@index([businessId, status])
+  @@map("adoption_animals")
+}
+
+model AdoptionInquiry {
+  id               String    @id @default(cuid())
+  adoptionAnimalId String
+  name             String
+  email            String?
+  phone            String
+  message          String?
+  status           String    @default("NEW")
+  rejectionReason  String?
+  createdAt        DateTime  @default(now())
+  contactedAt      DateTime?
+
+  adoptionAnimal AdoptionAnimal @relation(fields: [adoptionAnimalId], references: [id], onDelete: Cascade)
+
+  @@index([adoptionAnimalId])
+  @@map("adoption_inquiries")
+}
+
+model Adoption {
+  id               String    @id @default(cuid())
+  adoptionAnimalId String
+  tutorId          String
+  applicationDate  DateTime  @default(now())
+  interviewDate    DateTime?
+  homeVisitDate    DateTime?
+  adoptionDate     DateTime?
+  questionnaire    Json?
+  stage            String    @default("APPLICATION")
+  stageNotes       String?
+  agreementUrl     String?
+  signedAt         DateTime?
+  followUp7d       DateTime?
+  followUp7dNotes  String?
+  followUp30d      DateTime?
+  followUp30dNotes String?
+  followUp90d      DateTime?
+  followUp90dNotes String?
+  returnDate       DateTime?
+  returnReason     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  adoptionAnimal AdoptionAnimal @relation(fields: [adoptionAnimalId], references: [id], onDelete: Cascade)
+  tutor          Tutor          @relation(fields: [tutorId], references: [id])
+
+  @@index([adoptionAnimalId])
+  @@index([tutorId])
+  @@map("adoptions")
+}
+
+// ===========================================
+// HOSPEDAGEM / HOTEL
+// ===========================================
+
+model BoardingRoom {
+  id              String    @id @default(cuid())
+  businessId      String
+  name            String
+  code            String?
+  roomType        RoomType  @default(INDIVIDUAL)
+  acceptedSpecies Species[]
+  acceptedSizes   PetSize[]
+  capacity        Int       @default(1)
+  dailyRate       Decimal   @db.Decimal(10, 2)
+  extraPetRate    Decimal?  @db.Decimal(10, 2)
+  amenities       String[]
+  hasCamera       Boolean   @default(false)
+  cameraUrl       String?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  business  Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  boardings Boarding[]
+
+  @@unique([businessId, name])
+  @@map("boarding_rooms")
+}
+
+model Boarding {
+  id               String         @id @default(cuid())
+  businessId       String
+  tutorId          String
+  petId            String
+  roomId           String
+  checkInDate      DateTime
+  checkInTime      String?
+  checkOutDate     DateTime
+  checkOutTime     String?
+  status           BoardingStatus @default(RESERVED)
+  actualCheckIn    DateTime?
+  actualCheckOut   DateTime?
+  dailyRate        Decimal        @db.Decimal(10, 2)
+  totalDays        Int
+  subtotal         Decimal        @db.Decimal(10, 2)
+  extraServices    Decimal        @default(0) @db.Decimal(10, 2)
+  discount         Decimal        @default(0) @db.Decimal(10, 2)
+  totalAmount      Decimal        @db.Decimal(10, 2)
+  paymentStatus    PaymentStatus  @default(PENDING)
+  paidAmount       Decimal        @default(0) @db.Decimal(10, 2)
+  feedingSchedule  String?
+  foodType         String?
+  foodAmount       String?
+  medications      Json?
+  specialNeeds     String?
+  emergencyContact String?
+  emergencyPhone   String?
+  vetName          String?
+  vetPhone         String?
+  notes            String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  business Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  tutor    Tutor             @relation(fields: [tutorId], references: [id])
+  pet      Pet               @relation(fields: [petId], references: [id])
+  room     BoardingRoom      @relation(fields: [roomId], references: [id])
+  updates  BoardingUpdate[]
+  services BoardingService[]
+
+  @@index([businessId, status])
+  @@index([roomId, checkInDate, checkOutDate])
+  @@map("boardings")
+}
+
+model BoardingUpdate {
+  id          String   @id @default(cuid())
+  boardingId  String
+  userId      String
+  updateType  String
+  content     String?
+  photos      String[]
+  videoUrl    String?
+  sentToTutor Boolean  @default(false)
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  boarding Boarding @relation(fields: [boardingId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@index([boardingId])
+  @@map("boarding_updates")
+}
+
+model BoardingService {
+  id          String    @id @default(cuid())
+  boardingId  String
+  serviceName String
+  serviceDate DateTime
+  price       Decimal   @db.Decimal(10, 2)
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  notes       String?
+
+  boarding Boarding @relation(fields: [boardingId], references: [id], onDelete: Cascade)
+
+  @@map("boarding_services")
+}
+
+// ===========================================
+// DAYCARE / CRECHE
+// ===========================================
+
+model DaycarePackage {
+  id           String   @id @default(cuid())
+  businessId   String
+  name         String
+  description  String?
+  packageType  String
+  daysIncluded Int?
+  validityDays Int?
+  shift        String
+  price        Decimal  @db.Decimal(10, 2)
+  activities   String[]
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  business    Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  enrollments DaycareEnrollment[]
+
+  @@map("daycare_packages")
+}
+
+model DaycareEnrollment {
+  id               String        @id @default(cuid())
+  packageId        String
+  tutorId          String
+  petId            String
+  startDate        DateTime
+  endDate          DateTime?
+  totalCredits     Int           @default(0)
+  usedCredits      Int           @default(0)
+  remainingCredits Int           @default(0)
+  amount           Decimal       @db.Decimal(10, 2)
+  paymentStatus    PaymentStatus @default(PENDING)
+  paidAt           DateTime?
+  isActive         Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+
+  package     DaycarePackage      @relation(fields: [packageId], references: [id])
+  tutor       Tutor               @relation(fields: [tutorId], references: [id])
+  pet         Pet                 @relation(fields: [petId], references: [id])
+  attendances DaycareAttendance[]
+
+  @@index([tutorId])
+  @@index([petId])
+  @@map("daycare_enrollments")
+}
+
+model DaycareAttendance {
+  id            String    @id @default(cuid())
+  enrollmentId  String
+  date          DateTime  @db.Date
+  checkInTime   DateTime?
+  checkOutTime  DateTime?
+  status        String    @default("SCHEDULED")
+  behaviorNotes String?
+  activities    String[]
+  feedingNotes  String?
+  photos        String[]
+  createdAt     DateTime  @default(now())
+
+  enrollment DaycareEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, date])
+  @@map("daycare_attendances")
+}
+
+// ===========================================
+// SERVICOS E AGENDAMENTOS
+// ===========================================
+
+model Service {
+  id              String    @id @default(cuid())
+  businessId      String
+  name            String
+  description     String?
+  category        String
+  duration        Int
+  price           Decimal   @db.Decimal(10, 2)
+  priceBySize     Json?
+  acceptedSpecies Species[]
+  acceptedSizes   PetSize[]
+  requiresVet     Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@index([businessId])
+  @@map("services")
+}
+
+model Appointment {
+  id                  String            @id @default(cuid())
+  businessId          String
+  tutorId             String
+  petId               String
+  serviceId           String
+  professionalId      String
+  appointmentType     AppointmentType
+  scheduledDate       DateTime
+  scheduledTime       String
+  duration            Int
+  endTime             String?
+  status              AppointmentStatus @default(SCHEDULED)
+  confirmedAt         DateTime?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+  cancellationReason  String?
+  price               Decimal           @db.Decimal(10, 2)
+  discount            Decimal           @default(0) @db.Decimal(10, 2)
+  finalPrice          Decimal           @db.Decimal(10, 2)
+  paymentStatus       PaymentStatus     @default(PENDING)
+  paymentMethod       PaymentMethod?
+  paidAt              DateTime?
+  reminder24hSent     Boolean           @default(false)
+  reminder2hSent      Boolean           @default(false)
+  notes               String?
+  internalNotes       String?
+  isRecurring         Boolean           @default(false)
+  recurrenceRule      String?
+  parentAppointmentId String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  tutor          Tutor           @relation(fields: [tutorId], references: [id])
+  pet            Pet             @relation(fields: [petId], references: [id])
+  service        Service         @relation(fields: [serviceId], references: [id])
+  professional   User            @relation(fields: [professionalId], references: [id])
+  medicalRecords MedicalRecord[]
+  vaccineRecords VaccineRecord[]
+
+  @@index([businessId, scheduledDate])
+  @@index([professionalId, scheduledDate])
+  @@index([petId])
+  @@index([status])
+  @@map("appointments")
+}
+
+// ===========================================
+// PRODUTOS E ESTOQUE
+// ===========================================
+
+model Product {
+  id               String    @id @default(cuid())
+  businessId       String
+  name             String
+  description      String?
+  brand            String?
+  sku              String?
+  barcode          String?
+  category         String
+  subcategory      String?
+  forSpecies       Species[]
+  costPrice        Decimal   @db.Decimal(10, 2)
+  salePrice        Decimal   @db.Decimal(10, 2)
+  promotionalPrice Decimal?  @db.Decimal(10, 2)
+  promotionEndsAt  DateTime?
+  currentStock     Decimal   @default(0) @db.Decimal(10, 3)
+  minStock         Decimal   @default(0) @db.Decimal(10, 3)
+  maxStock         Decimal?  @db.Decimal(10, 3)
+  unit             String    @default("un")
+  expirationDate   DateTime?
+  alertDaysBefore  Int       @default(30)
+  supplierId       String?
+  supplierCode     String?
+  imageUrl         String?
+  images           String[]
+  isActive         Boolean   @default(true)
+  isFeatured       Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  stockMovements StockMovement[]
+  saleItems      SaleItem[]
+
+  @@unique([businessId, sku])
+  @@index([businessId, category])
+  @@map("products")
+}
+
+model StockMovement {
+  id            String            @id @default(cuid())
+  productId     String
+  type          StockMovementType
+  quantity      Decimal           @db.Decimal(10, 3)
+  previousStock Decimal           @db.Decimal(10, 3)
+  newStock      Decimal           @db.Decimal(10, 3)
+  unitCost      Decimal?          @db.Decimal(10, 2)
+  totalCost     Decimal?          @db.Decimal(10, 2)
+  saleId        String?
+  appointmentId String?
+  notes         String?
+  createdAt     DateTime          @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("stock_movements")
+}
+
+// ===========================================
+// VENDAS E FINANCEIRO
+// ===========================================
+
+model Sale {
+  id            String        @id @default(cuid())
+  businessId    String
+  tutorId       String?
+  userId        String
+  subtotal      Decimal       @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  totalAmount   Decimal       @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(COMPLETED)
+  installments  Int           @default(1)
+  invoiceNumber String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+
+  business Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  tutor    Tutor?     @relation(fields: [tutorId], references: [id])
+  user     User       @relation(fields: [userId], references: [id])
+  items    SaleItem[]
+
+  @@index([businessId, createdAt])
+  @@map("sales")
+}
+
+model SaleItem {
+  id          String  @id @default(cuid())
+  saleId      String
+  productId   String?
+  description String
+  quantity    Decimal @db.Decimal(10, 3)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  discount    Decimal @default(0) @db.Decimal(10, 2)
+  totalPrice  Decimal @db.Decimal(10, 2)
+  itemType    String
+
+  sale    Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id])
+
+  @@map("sale_items")
+}
+
+model CashRegister {
+  id            String    @id @default(cuid())
+  businessId    String
+  date          DateTime  @db.Date
+  cashTotal     Decimal   @default(0) @db.Decimal(10, 2)
+  pixTotal      Decimal   @default(0) @db.Decimal(10, 2)
+  creditTotal   Decimal   @default(0) @db.Decimal(10, 2)
+  debitTotal    Decimal   @default(0) @db.Decimal(10, 2)
+  totalRevenue  Decimal   @default(0) @db.Decimal(10, 2)
+  totalExpenses Decimal   @default(0) @db.Decimal(10, 2)
+  netAmount     Decimal   @default(0) @db.Decimal(10, 2)
+  salesCount    Int       @default(0)
+  servicesCount Int       @default(0)
+  isClosed      Boolean   @default(false)
+  closedAt      DateTime?
+  closedById    String?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, date])
+  @@map("cash_registers")
+}
+
+// ===========================================
+// MARKETING
+// ===========================================
+
+model Campaign {
+  id              String    @id @default(cuid())
+  businessId      String
+  name            String
+  type            String
+  message         String
+  segmentType     String?
+  customFilter    Json?
+  status          String    @default("DRAFT")
+  scheduledFor    DateTime?
+  completedAt     DateTime?
+  totalRecipients Int       @default(0)
+  sentCount       Int       @default(0)
+  failedCount     Int       @default(0)
+  responseCount   Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, status])
+  @@map("campaigns")
+}
+
+// ===========================================
+// WHATSAPP
+// ===========================================
+
+model WhatsAppMessage {
+  id            String    @id @default(cuid())
+  businessId    String
+  remoteJid     String
+  messageId     String?   @unique
+  direction     String
+  content       String
+  mediaUrl      String?
+  mediaType     String?
+  tutorId       String?
+  petId         String?
+  appointmentId String?
+  status        String    @default("SENT")
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  readAt        DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([businessId])
+  @@index([remoteJid])
+  @@map("whatsapp_messages")
+}
+
+model MessageTemplate {
+  id         String   @id @default(cuid())
+  businessId String
+  name       String
+  type       String
+  content    String
+  variables  String[]
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, type])
+  @@map("message_templates")
+}
+
+// ===========================================
+// PET SITTERS / CUIDADORES
+// ===========================================
+
+enum PetSitterStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+model PetSitter {
+  id                 String          @id @default(cuid())
+  name               String
+  email              String          @unique
+  phone              String
+  cpf                String?         @unique
+  passwordHash       String?
+  bio                String?
+  photoUrl           String?
+  photos             String[]
+  address            String?
+  city               String?
+  state              String?
+  zipCode            String?
+  latitude           Decimal?        @db.Decimal(10, 8)
+  longitude          Decimal?        @db.Decimal(11, 8)
+  serviceRadius      Int             @default(10)
+  acceptedSpecies    Species[]
+  acceptedSizes      PetSize[]
+  experience         String?
+  certifications     String[]
+  hasOwnTransport    Boolean         @default(false)
+  hasYard            Boolean         @default(false)
+  hasOtherPets       Boolean         @default(false)
+  otherPetsDetails   String?
+  status             PetSitterStatus @default(PENDING_APPROVAL)
+  approvedAt         DateTime?
+  rejectionReason    String?
+  documentsUrl       String[]
+  backgroundCheckUrl String?
+  averageRating      Decimal         @default(0) @db.Decimal(3, 2)
+  totalReviews       Int             @default(0)
+  totalBookings      Int             @default(0)
+  responseTime       Int?
+  responseRate       Decimal?        @db.Decimal(5, 2)
+  isVerified         Boolean         @default(false)
+  isFeatured         Boolean         @default(false)
+  isActive           Boolean         @default(true)
+  bankName           String?
+  bankAgency         String?
+  bankAccount        String?
+  pixKey             String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  services PetSitterService[]
+  bookings PetSitterBooking[]
+  reviews  PetSitterReview[]
+
+  @@index([city, state])
+  @@index([status])
+  @@map("pet_sitters")
+}
+
+model PetSitterService {
+  id           String   @id @default(cuid())
+  petSitterId  String
+  serviceType  String
+  name         String
+  description  String?
+  priceType    String
+  price        Decimal  @db.Decimal(10, 2)
+  pricePerSize Json?
+  duration     Int?
+  maxPets      Int      @default(1)
+  includesFood Boolean  @default(false)
+  includesMeds Boolean  @default(false)
+  availability Json?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  petSitter PetSitter          @relation(fields: [petSitterId], references: [id], onDelete: Cascade)
+  bookings  PetSitterBooking[]
+
+  @@index([petSitterId])
+  @@map("pet_sitter_services")
+}
+
+model PetSitterBooking {
+  id                String        @id @default(cuid())
+  petSitterId       String
+  serviceId         String
+  tutorName         String
+  tutorEmail        String?
+  tutorPhone        String
+  petName           String
+  petSpecies        Species
+  petSize           PetSize?
+  petAge            String?
+  petNotes          String?
+  startDate         DateTime
+  endDate           DateTime?
+  startTime         String?
+  endTime           String?
+  totalDays         Int?
+  totalHours        Decimal?      @db.Decimal(5, 2)
+  pricePerUnit      Decimal       @db.Decimal(10, 2)
+  subtotal          Decimal       @db.Decimal(10, 2)
+  serviceFee        Decimal       @default(0) @db.Decimal(10, 2)
+  totalAmount       Decimal       @db.Decimal(10, 2)
+  sitterPayout      Decimal       @db.Decimal(10, 2)
+  status            BookingStatus @default(PENDING)
+  confirmedAt       DateTime?
+  cancelledAt       DateTime?
+  cancellationReason String?
+  cancelledBy       String?
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentMethod     String?
+  paidAt            DateTime?
+  payoutStatus      String        @default("PENDING")
+  paidOutAt         DateTime?
+  specialRequests   String?
+  emergencyContact  String?
+  emergencyPhone    String?
+  vetName           String?
+  vetPhone          String?
+  feedingInstructions String?
+  medicationInstructions String?
+  updates           Json?
+  completedAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  petSitter PetSitter         @relation(fields: [petSitterId], references: [id])
+  service   PetSitterService  @relation(fields: [serviceId], references: [id])
+  review    PetSitterReview?
+
+  @@index([petSitterId, status])
+  @@index([status])
+  @@map("pet_sitter_bookings")
+}
+
+model PetSitterReview {
+  id           String   @id @default(cuid())
+  bookingId    String   @unique
+  petSitterId  String
+  rating       Int
+  title        String?
+  comment      String?
+  photos       String[]
+  response     String?
+  respondedAt  DateTime?
+  isVerified   Boolean  @default(true)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  booking   PetSitterBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  petSitter PetSitter        @relation(fields: [petSitterId], references: [id], onDelete: Cascade)
+
+  @@index([petSitterId])
+  @@map("pet_sitter_reviews")
+}
+
+// ===========================================
+// MARKETPLACE DE PRODUTOS E ALIMENTOS
+// ===========================================
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  SOLD
+  EXPIRED
+  REJECTED
+}
+
+model MarketplaceSeller {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  phone           String
+  cpfCnpj         String?  @unique
+  passwordHash    String?
+  companyName     String?
+  description     String?
+  logoUrl         String?
+  bannerUrl       String?
+  address         String?
+  city            String?
+  state           String?
+  zipCode         String?
+  sellerType      String
+  isVerified      Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  averageRating   Decimal  @default(0) @db.Decimal(3, 2)
+  totalReviews    Int      @default(0)
+  totalSales      Int      @default(0)
+  totalRevenue    Decimal  @default(0) @db.Decimal(12, 2)
+  commissionRate  Decimal  @default(10) @db.Decimal(5, 2)
+  bankName        String?
+  bankAgency      String?
+  bankAccount     String?
+  pixKey          String?
+  isActive        Boolean  @default(true)
+  approvedAt      DateTime?
+  suspendedAt     DateTime?
+  suspendedReason String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  listings MarketplaceListing[]
+  orders   MarketplaceOrder[]
+  reviews  MarketplaceReview[]
+
+  @@index([city, state])
+  @@map("marketplace_sellers")
+}
+
+model MarketplaceCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  imageUrl    String?
+  parentId    String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  parent   MarketplaceCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children MarketplaceCategory[] @relation("CategoryHierarchy")
+  listings MarketplaceListing[]
+
+  @@map("marketplace_categories")
+}
+
+model MarketplaceListing {
+  id                String        @id @default(cuid())
+  sellerId          String
+  categoryId        String
+  title             String
+  slug              String
+  description       String
+  shortDescription  String?
+  brand             String?
+  sku               String?
+  barcode           String?
+  forSpecies        Species[]
+  forSizes          PetSize[]
+  price             Decimal       @db.Decimal(10, 2)
+  compareAtPrice    Decimal?      @db.Decimal(10, 2)
+  costPrice         Decimal?      @db.Decimal(10, 2)
+  stock             Int           @default(0)
+  lowStockThreshold Int           @default(5)
+  weight            Decimal?      @db.Decimal(10, 3)
+  dimensions        String?
+  images            String[]
+  videoUrl          String?
+  tags              String[]
+  attributes        Json?
+  nutritionInfo     Json?
+  ingredients       String?
+  expirationDate    DateTime?
+  shippingType      String        @default("STANDARD")
+  freeShipping      Boolean       @default(false)
+  shippingPrice     Decimal?      @db.Decimal(10, 2)
+  status            ListingStatus @default(DRAFT)
+  rejectionReason   String?
+  publishedAt       DateTime?
+  featuredUntil     DateTime?
+  viewCount         Int           @default(0)
+  favoriteCount     Int           @default(0)
+  salesCount        Int           @default(0)
+  averageRating     Decimal       @default(0) @db.Decimal(3, 2)
+  totalReviews      Int           @default(0)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  seller     MarketplaceSeller    @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  category   MarketplaceCategory  @relation(fields: [categoryId], references: [id])
+  orderItems MarketplaceOrderItem[]
+  reviews    MarketplaceReview[]
+
+  @@unique([sellerId, slug])
+  @@index([categoryId])
+  @@index([status])
+  @@index([forSpecies])
+  @@map("marketplace_listings")
+}
+
+model MarketplaceOrder {
+  id               String        @id @default(cuid())
+  sellerId         String
+  orderNumber      String        @unique
+  buyerName        String
+  buyerEmail       String
+  buyerPhone       String
+  buyerCpf         String?
+  shippingAddress  String
+  shippingCity     String
+  shippingState    String
+  shippingZipCode  String
+  subtotal         Decimal       @db.Decimal(10, 2)
+  shippingCost     Decimal       @default(0) @db.Decimal(10, 2)
+  discount         Decimal       @default(0) @db.Decimal(10, 2)
+  totalAmount      Decimal       @db.Decimal(10, 2)
+  commission       Decimal       @db.Decimal(10, 2)
+  sellerPayout     Decimal       @db.Decimal(10, 2)
+  paymentMethod    String
+  paymentStatus    PaymentStatus @default(PENDING)
+  paidAt           DateTime?
+  payoutStatus     String        @default("PENDING")
+  paidOutAt        DateTime?
+  status           String        @default("PENDING")
+  shippedAt        DateTime?
+  trackingCode     String?
+  trackingUrl      String?
+  deliveredAt      DateTime?
+  cancelledAt      DateTime?
+  cancellationReason String?
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  seller MarketplaceSeller      @relation(fields: [sellerId], references: [id])
+  items  MarketplaceOrderItem[]
+
+  @@index([sellerId])
+  @@index([status])
+  @@map("marketplace_orders")
+}
+
+model MarketplaceOrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  listingId   String
+  title       String
+  sku         String?
+  quantity    Int
+  unitPrice   Decimal @db.Decimal(10, 2)
+  totalPrice  Decimal @db.Decimal(10, 2)
+
+  order   MarketplaceOrder   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  listing MarketplaceListing @relation(fields: [listingId], references: [id])
+
+  @@map("marketplace_order_items")
+}
+
+model MarketplaceReview {
+  id          String   @id @default(cuid())
+  listingId   String
+  sellerId    String
+  buyerName   String
+  buyerEmail  String?
+  rating      Int
+  title       String?
+  comment     String?
+  photos      String[]
+  isVerified  Boolean  @default(false)
+  isPublished Boolean  @default(true)
+  response    String?
+  respondedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  listing MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  seller  MarketplaceSeller  @relation(fields: [sellerId], references: [id])
+
+  @@index([listingId])
+  @@index([sellerId])
+  @@map("marketplace_reviews")
+}

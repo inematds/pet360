@@ -1,0 +1,78 @@
+version: '3.8'
+
+# Development Docker Compose
+# Use with: docker compose -f docker-compose.dev.yml up -d
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: pet360-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pet360
+      POSTGRES_PASSWORD: pet360_secret
+      POSTGRES_DB: pet360
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pet360"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: pet360-redis-dev
+    restart: unless-stopped
+    volumes:
+      - redis_dev_data:/data
+    ports:
+      - "6379:6379"
+
+  # PgAdmin (Database Management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pet360-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pet360.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  # Evolution API (WhatsApp) - Development
+  evolution:
+    image: atendai/evolution-api:latest
+    container_name: pet360-evolution-dev
+    restart: unless-stopped
+    environment:
+      SERVER_URL: http://localhost:8080
+      AUTHENTICATION_TYPE: apikey
+      AUTHENTICATION_API_KEY: dev-api-key
+      DATABASE_ENABLED: true
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://pet360:pet360_secret@postgres:5432/pet360
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - evolution_dev_instances:/evolution/instances
+      - evolution_dev_store:/evolution/store
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+  evolution_dev_instances:
+  evolution_dev_store:
+
+networks:
+  default:
+    name: pet360-dev-network
