@@ -51,6 +51,16 @@ export class AppointmentsController {
     return this.appointmentsService.update(id, req.user.businessId, data);
   }
 
+  @Put(':id/status')
+  @ApiOperation({ summary: 'Atualizar status do agendamento' })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() data: { status: string },
+    @Request() req: any,
+  ) {
+    return this.appointmentsService.updateStatus(id, req.user.businessId, data.status);
+  }
+
   @Post(':id/confirm')
   @ApiOperation({ summary: 'Confirmar agendamento' })
   async confirm(@Param('id') id: string, @Request() req: any) {

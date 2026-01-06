@@ -29,6 +29,18 @@ export class AuthController {
     return this.authService.refreshToken(refreshTokenDto.refresh_token);
   }
 
+  @Post('otp/request')
+  @ApiOperation({ summary: 'Solicitar codigo OTP via WhatsApp' })
+  async requestOtp(@Body() body: { phone: string }) {
+    return this.authService.requestOtp(body.phone);
+  }
+
+  @Post('otp/verify')
+  @ApiOperation({ summary: 'Verificar codigo OTP e fazer login' })
+  async verifyOtp(@Body() body: { phone: string; otp: string }) {
+    return this.authService.verifyOtp(body.phone, body.otp);
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
