@@ -828,7 +828,7 @@ model Sale {
   discount      Decimal       @default(0) @db.Decimal(10, 2)
   totalAmount   Decimal       @db.Decimal(10, 2)
   paymentMethod PaymentMethod
-  paymentStatus PaymentStatus @default(COMPLETED)
+  paymentStatus PaymentStatus @default(PAID)
   installments  Int           @default(1)
   invoiceNumber String?
   notes         String?
