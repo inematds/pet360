@@ -69,11 +69,13 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        # IMPORTANT: Set to your public domain URL for production
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
     container_name: pet360-web
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://api:3001
     ports:
       - "3000:3000"
     depends_on:

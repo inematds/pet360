@@ -123,7 +123,9 @@ export class MarketplaceService {
     page?: number;
     limit?: number;
   }) {
-    const { categoryId, sellerId, species, size, minPrice, maxPrice, search, freeShipping, sortBy, page = 1, limit = 20 } = query;
+    const { categoryId, sellerId, species, size, minPrice, maxPrice, search, freeShipping, sortBy } = query;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 20;
 
     const where: Prisma.MarketplaceListingWhereInput = { status: 'ACTIVE' };
 

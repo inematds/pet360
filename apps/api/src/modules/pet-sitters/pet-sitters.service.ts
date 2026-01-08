@@ -47,7 +47,9 @@ export class PetSittersService {
     page?: number;
     limit?: number;
   }) {
-    const { city, state, species, size, serviceType, minRating, page = 1, limit = 20 } = query;
+    const { city, state, species, size, serviceType, minRating } = query;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 20;
 
     const where: Prisma.PetSitterWhereInput = {
       status: 'APPROVED',
