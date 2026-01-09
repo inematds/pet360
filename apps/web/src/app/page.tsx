@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -226,104 +227,72 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50" />
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full blur-3xl" />
-          <div className="absolute top-40 right-10 w-96 h-96 bg-purple-200 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-200 rounded-full blur-3xl" />
+      {/* Hero Section with Banner */}
+      <section className="relative pt-24 overflow-hidden">
+        {/* Hero Banner Image */}
+        <div className="relative w-full">
+          <Image
+            src="/images/hero-banner-2.jpg"
+            alt="Pet360 - Sistema Completo de Gestao para Negocios Pet"
+            width={1920}
+            height={1080}
+            className="w-full h-auto object-cover"
+            priority
+          />
+          {/* Overlay with CTA */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent flex items-center">
+            <div className="container mx-auto px-4">
+              <div className="max-w-xl">
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full mb-6">
+                  <Sparkles className="h-4 w-4" />
+                  <span className="text-sm font-medium">Plataforma #1 para Negocios Pet</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+                  Sistema Completo de Gestao Pet
+                </h1>
+                <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed drop-shadow">
+                  Clinicas veterinarias, pet shops, hoteis e daycares em uma unica plataforma.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link href="/register">
+                    <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white text-lg px-8 py-6 h-auto shadow-lg">
+                      <Zap className="h-5 w-5 mr-2" />
+                      Comecar Gratis
+                    </Button>
+                  </Link>
+                  <Link href="#features">
+                    <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 text-lg px-8 py-6 h-auto">
+                      Conhecer Recursos
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+                <div className="flex flex-wrap items-center gap-6 mt-8 text-sm text-white/80">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-400" />
+                    <span>Setup em 5 minutos</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-400" />
+                    <span>Sem cartao de credito</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-8">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-sm font-medium">Plataforma #1 para Negocios Pet</span>
-            </div>
-
-            {/* Title */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              <span className="text-gray-900">Gestao Completa</span>
-              <br />
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                para seu Negocio Pet
-              </span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Clinicas veterinarias, pet shops, hoteis e daycares em uma unica plataforma.
-              Agendamentos, prontuarios, estoque, financeiro e WhatsApp integrado.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <Link href="/register">
-                <Button size="lg" className="bg-gradient-to-r from-primary to-blue-600 hover:opacity-90 transition-opacity text-lg px-8 py-6 h-auto">
-                  <Zap className="h-5 w-5 mr-2" />
-                  Comecar Gratis Agora
-                </Button>
-              </Link>
-              <Link href="#demo">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 h-auto group">
-                  Ver Demonstracao
-                  <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* Trust Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-500" />
-                <span>Setup em 5 minutos</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-500" />
-                <span>Sem cartao de credito</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-500" />
-                <span>Cancele quando quiser</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Hero Image/Dashboard Preview */}
-          <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10" />
-            <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-t-2xl shadow-2xl mx-auto max-w-5xl overflow-hidden border border-gray-200">
-              <div className="bg-gray-800 px-4 py-3 flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-                <div className="flex-1 bg-gray-700 rounded-md mx-4 px-3 py-1 text-xs text-gray-400">
-                  pet360.com.br/dashboard
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-gray-50 to-white p-8 min-h-[400px] flex items-center justify-center">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
-                  {[
-                    { label: 'Agendamentos Hoje', value: '24', icon: Calendar, color: 'blue' },
-                    { label: 'Pets Atendidos', value: '156', icon: PawPrint, color: 'green' },
-                    { label: 'Faturamento', value: 'R$ 8.450', icon: TrendingUp, color: 'purple' },
-                    { label: 'Vacinas Pendentes', value: '12', icon: Syringe, color: 'orange' },
-                  ].map((stat, i) => (
-                    <div key={i} className={`bg-white rounded-xl p-4 shadow-lg border border-gray-100`}>
-                      <div className={`w-10 h-10 rounded-lg bg-${stat.color}-100 flex items-center justify-center mb-3`}>
-                        <stat.icon className={`h-5 w-5 text-${stat.color}-600`} />
-                      </div>
-                      <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                      <div className="text-xs text-gray-500">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Second Banner Section */}
+      <section id="demo" className="relative overflow-hidden">
+        <div className="relative w-full">
+          <Image
+            src="/images/hero-banner-1.jpg"
+            alt="Pet360 - Todas as funcionalidades"
+            width={1920}
+            height={1080}
+            className="w-full h-auto object-cover"
+          />
         </div>
       </section>
 
