@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="ref/photo_5118356803921054612_y.jpg" alt="Pet360 - Sistema Completo de Gestao para Negocios Pet" width="100%"/>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Pet360-v1.0-blue?style=for-the-badge" alt="Pet360 v1.0"/>
   <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js 14"/>
   <img src="https://img.shields.io/badge/NestJS-10-red?style=for-the-badge&logo=nestjs" alt="NestJS"/>
