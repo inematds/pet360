@@ -6,6 +6,16 @@ module.exports = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    // Dynamic colors used in landing page
+    'bg-blue-50', 'bg-blue-100', 'bg-blue-500', 'text-blue-600',
+    'bg-green-50', 'bg-green-100', 'bg-green-500', 'text-green-600',
+    'bg-purple-50', 'bg-purple-100', 'bg-purple-500', 'text-purple-600',
+    'bg-orange-50', 'bg-orange-100', 'bg-orange-500', 'text-orange-600',
+    'bg-pink-50', 'bg-pink-100', 'bg-pink-500', 'text-pink-600',
+    'bg-red-50', 'bg-red-100', 'bg-red-500', 'text-red-600',
+    'bg-emerald-500', 'bg-indigo-500',
+  ],
   theme: {
     container: {
       center: true,
