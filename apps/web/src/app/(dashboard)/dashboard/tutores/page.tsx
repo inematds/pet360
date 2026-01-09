@@ -28,13 +28,15 @@ export default function TutoresPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: tutors, isLoading } = useQuery({
+  const { data: tutorsResponse, isLoading } = useQuery({
     queryKey: ['tutors', search],
     queryFn: async () => {
       const response = await api.get('/tutors', { params: { search } });
       return response.data;
     },
   });
+
+  const tutors = tutorsResponse?.data || [];
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {

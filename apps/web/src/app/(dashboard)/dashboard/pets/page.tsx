@@ -42,7 +42,7 @@ export default function PetsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: pets, isLoading } = useQuery({
+  const { data: petsResponse, isLoading } = useQuery({
     queryKey: ['pets', search],
     queryFn: async () => {
       const response = await api.get('/pets', { params: { search } });
@@ -50,13 +50,17 @@ export default function PetsPage() {
     },
   });
 
-  const { data: tutors } = useQuery({
+  const pets = petsResponse?.data || [];
+
+  const { data: tutorsResponse } = useQuery({
     queryKey: ['tutors-select'],
     queryFn: async () => {
       const response = await api.get('/tutors');
       return response.data;
     },
   });
+
+  const tutors = tutorsResponse?.data || [];
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {

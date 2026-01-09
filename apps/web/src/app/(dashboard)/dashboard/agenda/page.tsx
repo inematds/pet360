@@ -46,7 +46,7 @@ export default function AgendaPage() {
 
   const dateStr = selectedDate.toISOString().split('T')[0];
 
-  const { data: appointments, isLoading } = useQuery({
+  const { data: appointmentsResponse, isLoading } = useQuery({
     queryKey: ['appointments', dateStr],
     queryFn: async () => {
       const response = await api.get('/appointments', { params: { date: dateStr } });
@@ -54,7 +54,9 @@ export default function AgendaPage() {
     },
   });
 
-  const { data: tutors } = useQuery({
+  const appointments = appointmentsResponse?.data || [];
+
+  const { data: tutorsResponse } = useQuery({
     queryKey: ['tutors-select'],
     queryFn: async () => {
       const response = await api.get('/tutors');
@@ -62,7 +64,9 @@ export default function AgendaPage() {
     },
   });
 
-  const { data: services } = useQuery({
+  const tutors = tutorsResponse?.data || [];
+
+  const { data: servicesResponse } = useQuery({
     queryKey: ['services-select'],
     queryFn: async () => {
       const response = await api.get('/services');
@@ -70,13 +74,17 @@ export default function AgendaPage() {
     },
   });
 
-  const { data: professionals } = useQuery({
+  const services = servicesResponse?.data || [];
+
+  const { data: professionalsResponse } = useQuery({
     queryKey: ['users-select'],
     queryFn: async () => {
       const response = await api.get('/users');
       return response.data;
     },
   });
+
+  const professionals = professionalsResponse?.data || [];
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
