@@ -14,7 +14,12 @@ import {
   TrendingUp,
   Package,
   Syringe,
-  Hotel
+  Hotel,
+  PawPrint,
+  Activity,
+  ArrowUpRight,
+  ArrowDownRight,
+  Target,
 } from 'lucide-react';
 
 export default function AnalyticsPage() {
@@ -53,194 +58,183 @@ export default function AnalyticsPage() {
   const newTutorsThisMonth = metrics.newTutorsThisMonth || 0;
   const vaccinesDue = metrics.vaccinesDue || 0;
 
+  const overviewStats = [
+    { label: 'Tutores', value: totalTutors, icon: Users, gradient: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' },
+    { label: 'Pets', value: totalPets, icon: Dog, gradient: 'from-green-500 to-emerald-600', textColor: 'text-green-600' },
+    { label: 'Agendamentos', value: totalAppointments, icon: Calendar, gradient: 'from-purple-500 to-violet-600', textColor: 'text-purple-600' },
+    { label: 'Vendas', value: totalSales, icon: ShoppingCart, gradient: 'from-orange-500 to-amber-600', textColor: 'text-orange-600' },
+  ];
+
+  const serviceStats = [
+    { label: 'Produtos Cadastrados', value: totalProducts, icon: Package },
+    { label: 'Vacinas Aplicadas', value: totalVaccines, icon: Syringe },
+    { label: 'Hospedagens', value: totalBoardings, icon: Hotel },
+  ];
+
+  const periodStats = [
+    { label: 'Agendamentos esta semana', value: appointmentsThisWeek, icon: Calendar, color: 'text-blue-600 bg-blue-50' },
+    { label: 'Vendas este mes', value: salesThisMonth, icon: ShoppingCart, color: 'text-green-600 bg-green-50' },
+    { label: 'Novos tutores este mes', value: newTutorsThisMonth, icon: Users, color: 'text-purple-600 bg-purple-50' },
+    { label: 'Vacinas pendentes', value: vaccinesDue, icon: Syringe, color: 'text-orange-600 bg-orange-50' },
+  ];
+
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Analytics</h1>
-          <p className="text-gray-600">Metricas e estatisticas do negocio</p>
+      <div className="space-y-6 pb-8">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-violet-600 p-6 text-white">
+          <div className="absolute right-0 top-0 opacity-10">
+            <BarChart3 className="h-48 w-48 -translate-y-8 translate-x-8" />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-1">
+              <Activity className="h-5 w-5" />
+              <span className="text-violet-100 text-sm font-medium">Metricas e Estatisticas</span>
+            </div>
+            <h1 className="text-2xl font-bold">Analytics</h1>
+            <p className="text-violet-100 text-sm mt-1">Visao geral do seu negocio</p>
+          </div>
         </div>
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-violet-200 border-t-violet-600"></div>
+            <PawPrint className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-violet-600" />
+          </div>
+          <p className="mt-4 text-gray-500">Carregando metricas...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Analytics</h1>
-        <p className="text-gray-600">Metricas e estatisticas do negocio</p>
+    <div className="space-y-6 pb-8">
+      {/* Header com Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-violet-600 p-6 text-white">
+        <div className="absolute right-0 top-0 opacity-10">
+          <BarChart3 className="h-48 w-48 -translate-y-8 translate-x-8" />
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-1">
+            <Activity className="h-5 w-5" />
+            <span className="text-violet-100 text-sm font-medium">Metricas e Estatisticas</span>
+          </div>
+          <h1 className="text-2xl font-bold">Analytics</h1>
+          <p className="text-violet-100 text-sm mt-1">Visao geral do seu negocio</p>
+        </div>
       </div>
 
-      {/* Overview Cards */}
+      {/* Overview Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-5 w-5 text-blue-600" />
+        {overviewStats.map((stat) => (
+          <Card key={stat.label} className="border-0 shadow-card overflow-hidden">
+            <div className={`h-1 bg-gradient-to-r ${stat.gradient}`} />
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 bg-gradient-to-br ${stat.gradient} rounded-xl`}>
+                  <stat.icon className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">{stat.label}</p>
+                  <p className={`text-xl font-bold ${stat.textColor}`}>{stat.value}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Tutores</p>
-                <p className="text-2xl font-bold">{totalTutors}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Dog className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Pets</p>
-                <p className="text-2xl font-bold">{totalPets}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Calendar className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Agendamentos</p>
-                <p className="text-2xl font-bold">{totalAppointments}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <ShoppingCart className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Vendas</p>
-                <p className="text-2xl font-bold">{totalSales}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Revenue Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Receita Total
-          </CardTitle>
+      <Card className="border-0 shadow-card overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-green-500 to-emerald-600" />
+        <CardHeader className="border-b bg-gradient-to-r from-green-50 to-emerald-50">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 rounded-xl">
+              <DollarSign className="h-5 w-5 text-green-600" />
+            </div>
+            <CardTitle>Receita Total</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="text-4xl font-bold text-green-600">
               {formatCurrency(Number(totalRevenue))}
             </div>
-            <div className="flex items-center gap-1 text-green-600">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 rounded-full text-green-600">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-sm">Total acumulado</span>
+              <span className="text-sm font-medium">Total acumulado</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Secondary Stats */}
+      {/* Secondary Stats Grid */}
       <div className="grid md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Servicos</CardTitle>
+        {/* Services Card */}
+        <Card className="border-0 shadow-card overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-gray-400 to-gray-500" />
+          <CardHeader className="border-b bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gray-100 rounded-xl">
+                <Target className="h-5 w-5 text-gray-600" />
+              </div>
+              <CardTitle className="text-lg">Servicos</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Package className="h-4 w-4 text-gray-600" />
+          <CardContent className="p-0">
+            <div className="divide-y divide-gray-100">
+              {serviceStats.map((stat) => (
+                <div key={stat.label} className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <stat.icon className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <span className="text-gray-700">{stat.label}</span>
+                  </div>
+                  <span className="font-bold text-gray-900">{stat.value}</span>
                 </div>
-                <span>Produtos Cadastrados</span>
-              </div>
-              <span className="font-bold">{totalProducts}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Syringe className="h-4 w-4 text-gray-600" />
-                </div>
-                <span>Vacinas Aplicadas</span>
-              </div>
-              <span className="font-bold">{totalVaccines}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Hotel className="h-4 w-4 text-gray-600" />
-                </div>
-                <span>Hospedagens</span>
-              </div>
-              <span className="font-bold">{totalBoardings}</span>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Periodo Atual</CardTitle>
+        {/* Period Stats Card */}
+        <Card className="border-0 shadow-card overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-violet-400 to-purple-500" />
+          <CardHeader className="border-b bg-gradient-to-r from-violet-50 to-purple-50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-violet-100 rounded-xl">
+                <Calendar className="h-5 w-5 text-violet-600" />
+              </div>
+              <CardTitle className="text-lg">Periodo Atual</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Calendar className="h-4 w-4 text-blue-600" />
+          <CardContent className="p-0">
+            <div className="divide-y divide-gray-100">
+              {periodStats.map((stat) => (
+                <div key={stat.label} className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${stat.color.split(' ')[1]}`}>
+                      <stat.icon className={`h-4 w-4 ${stat.color.split(' ')[0]}`} />
+                    </div>
+                    <span className="text-gray-700">{stat.label}</span>
+                  </div>
+                  <span className={`font-bold ${stat.color.split(' ')[0]}`}>{stat.value}</span>
                 </div>
-                <span>Agendamentos esta semana</span>
-              </div>
-              <span className="font-bold text-blue-600">{appointmentsThisWeek}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <ShoppingCart className="h-4 w-4 text-green-600" />
-                </div>
-                <span>Vendas este mes</span>
-              </div>
-              <span className="font-bold text-green-600">{salesThisMonth}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Users className="h-4 w-4 text-purple-600" />
-                </div>
-                <span>Novos tutores este mes</span>
-              </div>
-              <span className="font-bold text-purple-600">{newTutorsThisMonth}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Syringe className="h-4 w-4 text-orange-600" />
-                </div>
-                <span>Vacinas pendentes</span>
-              </div>
-              <span className="font-bold text-orange-600">{vaccinesDue}</span>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Info Card */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="py-4">
-          <div className="flex items-center gap-3">
-            <BarChart3 className="h-6 w-6 text-blue-600" />
+      <Card className="border-0 shadow-card bg-gradient-to-r from-violet-50 to-purple-50 overflow-hidden">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-violet-100 rounded-xl">
+              <BarChart3 className="h-6 w-6 text-violet-600" />
+            </div>
             <div>
-              <p className="font-medium text-blue-900">Dashboard de Analytics</p>
-              <p className="text-sm text-blue-700">
+              <p className="font-semibold text-violet-900">Dashboard de Analytics</p>
+              <p className="text-sm text-violet-700">
                 Graficos detalhados e relatorios avancados estarao disponiveis em breve.
               </p>
             </div>
