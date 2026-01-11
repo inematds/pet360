@@ -46,6 +46,7 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://pet360:pet360_secret@postgres:5432/pet360
       REDIS_URL: redis://redis:6379
+      FRONTEND_URL: ${FRONTEND_URL:-http://pet360.inema.online:3000}
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       JWT_EXPIRATION: 15m
       JWT_REFRESH_EXPIRATION: 7d
