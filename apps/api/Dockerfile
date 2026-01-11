@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -36,6 +39,9 @@ RUN /app/node_modules/.bin/nest build
 FROM node:20-alpine AS production
 
 WORKDIR /app
+
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
