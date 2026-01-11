@@ -7,7 +7,7 @@ import {
   Calendar,
   Stethoscope,
   Syringe,
-  Home,
+  Home as HomeIcon,
   ShoppingBag,
   MessageCircle,
   BarChart3,
@@ -51,7 +51,7 @@ const features = [
     color: 'bg-purple-500',
   },
   {
-    icon: Home,
+    icon: HomeIcon,
     title: 'Hotel & Daycare',
     description: 'Check-in digital, updates diarios com fotos e controle completo de hospedagem.',
     color: 'bg-orange-500',
@@ -361,7 +361,7 @@ export default function Home() {
               { icon: Stethoscope, label: 'Clinica Veterinaria', color: 'blue' },
               { icon: ShoppingBag, label: 'Pet Shop', color: 'pink' },
               { icon: Sparkles, label: 'Banho e Tosa', color: 'purple' },
-              { icon: Home, label: 'Hotel Pet', color: 'orange' },
+              { icon: HomeIcon, label: 'Hotel Pet', color: 'orange' },
               { icon: Users, label: 'Daycare', color: 'green' },
               { icon: Heart, label: 'Centro de Adocao', color: 'red' },
             ].map((type, i) => (
