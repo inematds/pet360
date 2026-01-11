@@ -8,7 +8,6 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy workspace files
 COPY pnpm-workspace.yaml ./
-COPY pnpm-lock.yaml ./
 COPY package.json ./
 
 # Copy packages
@@ -18,7 +17,7 @@ COPY packages/shared/package.json ./packages/shared/
 COPY apps/web/package.json ./apps/web/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Copy source code
 COPY packages/shared ./packages/shared
