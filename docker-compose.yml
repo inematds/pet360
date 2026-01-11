@@ -46,7 +46,7 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://pet360:pet360_secret@postgres:5432/pet360
       REDIS_URL: redis://redis:6379
-      FRONTEND_URL: ${FRONTEND_URL:-http://pet360.inema.online:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://pet360.inema.online}
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       JWT_EXPIRATION: 15m
       JWT_REFRESH_EXPIRATION: 7d
@@ -72,7 +72,7 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         # IMPORTANT: Set to your public domain URL for production
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://pet360.inema.online}
     container_name: pet360-web
     restart: unless-stopped
     environment:
@@ -117,8 +117,6 @@ services:
     depends_on:
       - web
       - api
-    profiles:
-      - production
 
 volumes:
   postgres_data:
