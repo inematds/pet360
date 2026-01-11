@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Pet360 Backend API",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
