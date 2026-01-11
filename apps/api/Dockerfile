@@ -28,9 +28,9 @@ COPY apps/api ./apps/api
 WORKDIR /app/apps/api
 RUN /app/node_modules/.bin/prisma generate
 
-# Build from root to find nest cli
-WORKDIR /app
-RUN pnpm --filter @pet360/api build
+# Build using nest cli directly from hoisted node_modules
+WORKDIR /app/apps/api
+RUN /app/node_modules/.bin/nest build
 
 # Production stage
 FROM node:20-alpine AS production
