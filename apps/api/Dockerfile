@@ -9,6 +9,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Copy workspace files
 COPY pnpm-workspace.yaml ./
 COPY package.json ./
+COPY .npmrc ./
 
 # Copy packages
 COPY packages/shared/package.json ./packages/shared/
