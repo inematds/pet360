@@ -58,4 +58,4 @@ ENV NODE_ENV=production
 EXPOSE 3001
 
 # Run migrations and start
-CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy || true; node dist/main"]
