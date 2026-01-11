@@ -11,7 +11,7 @@ describe('AuthService', () => {
   let prismaService: PrismaService;
   let jwtService: JwtService;
 
-  const mockPrismaService = {
+  const mockPrismaService: any = {
     user: {
       findUnique: jest.fn(),
       findFirst: jest.fn(),
@@ -21,7 +21,7 @@ describe('AuthService', () => {
     business: {
       create: jest.fn(),
     },
-    $transaction: jest.fn((callback) => callback(mockPrismaService)),
+    $transaction: jest.fn((callback: any) => callback(mockPrismaService)),
   };
 
   const mockJwtService = {
@@ -30,8 +30,8 @@ describe('AuthService', () => {
   };
 
   const mockConfigService = {
-    get: jest.fn((key: string) => {
-      const config = {
+    get: jest.fn((key: string): string => {
+      const config: Record<string, string> = {
         JWT_SECRET: 'test-secret',
         JWT_REFRESH_SECRET: 'test-refresh-secret',
         JWT_EXPIRATION: '15m',
