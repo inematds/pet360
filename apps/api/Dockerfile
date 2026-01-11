@@ -26,7 +26,7 @@ COPY apps/api ./apps/api
 
 # Generate Prisma client
 WORKDIR /app/apps/api
-RUN npx prisma generate
+RUN /app/node_modules/.bin/prisma generate
 
 # Build
 RUN pnpm build
@@ -51,4 +51,4 @@ ENV NODE_ENV=production
 EXPOSE 3001
 
 # Run migrations and start
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/main"]
